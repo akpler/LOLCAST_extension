@@ -1,0 +1,68 @@
+.lolcast-button { cursor: pointer; }
+.lolcast-picker { position: fixed; z-index: 2147483647; right: 8px; bottom: 48px; width: min(360px, calc(100vw - 16px)); max-height: min(470px, calc(100vh - 64px)); box-sizing: border-box; padding: 10px; border: 1px solid #bbb; border-radius: 8px; background: #fff; box-shadow: 0 8px 28px #0003; color: #222; font: 14px/1.4 sans-serif; }
+.lolcast-picker-dark { background: #202328 !important; border-color: #454b54 !important; color: #e6e8eb !important; }
+.lolcast-head { display: flex; gap: 6px; }
+.lolcast-search { flex: 1; min-width: 0; padding: 8px; border: 1px solid #ccc; border-radius: 4px; }
+.lolcast-picker-dark .lolcast-search { background: #17191c !important; border-color: #59616c !important; color: #f1f3f4 !important; caret-color: #fff; }
+.lolcast-picker-dark .lolcast-search::placeholder { color: #aab0b8 !important; }
+.lolcast-close { width: 32px; border: 0; background: transparent; font-size: 22px; cursor: pointer; }
+.lolcast-picker-dark .lolcast-close { color: #f1f3f4 !important; }
+.lolcast-status { min-height: 22px; padding: 7px 2px; color: #666; }
+.lolcast-picker-dark .lolcast-status { color: #c5cbd3 !important; }
+.lolcast-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; max-height: min(380px, calc(100vh - 150px)); overflow: auto; }
+.lolcast-result { aspect-ratio: 1; padding: 0; overflow: hidden; border: 1px solid #ddd; border-radius: 4px; background: #f5f5f5; cursor: pointer; }
+.lolcast-picker-dark .lolcast-result { border-color: #59616c; background: #17191c; }
+.lolcast-picker-dark input,
+.lolcast-picker-dark button,
+.lolcast-picker-dark .lolcast-result,
+.lolcast-picker-dark .lolcast-recent-remove { color-scheme: dark; }
+.lolcast-result img { width: 100%; height: 100%; object-fit: cover; }
+.lolcast-recent-card { position: relative; min-width: 0; }
+.lolcast-recent-remove { position: absolute; top: 3px; right: 3px; width: 22px; height: 22px; padding: 0; border: 0; border-radius: 50%; background: #111b; color: white; font: 18px/22px sans-serif; cursor: pointer; }
+.lolcast-inline-gif {
+  display: inline-block !important;
+  box-sizing: border-box !important;
+  width: 72px !important;
+  height: 72px !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  max-width: 72px !important;
+  max-height: 72px !important;
+  margin: 2px 4px;
+  vertical-align: middle;
+  border-radius: 4px;
+  object-fit: contain !important;
+}
+
+/* lolcast.kr 오른쪽 채팅 메뉴 */
+#chat-panel.lolcast-chat-dark { background: #17191c !important; color: #e6e8eb !important; }
+#chat-panel.lolcast-chat-dark .chat-menu-bar { background: #202328 !important; border-color: #383c43 !important; }
+#chat-panel.lolcast-chat-dark .chat-menu-button { background: #292d33 !important; border-color: #444a52 !important; color: #e6e8eb !important; }
+#chat-panel.lolcast-chat-dark .chat-menu-button:hover { background: #383e46 !important; }
+.chat-menu-button.lolcast-theme-toggle { flex: 0 1 36px; width: 36px; min-width: 32px; box-sizing: border-box; padding: 0 3px; font-size: 11px; line-height: 1.2; white-space: nowrap; }
+.lolcast-theme-addon .lolcast-theme-toggle { cursor: pointer; }
+
+/* 외부 채팅 iframe 내부 */
+body.lolcast-chat-dark { background: #17191c !important; color: #e6e8eb !important; color-scheme: dark; }
+body.lolcast-chat-dark .ichat,
+body.lolcast-chat-dark #chattings,
+body.lolcast-chat-dark #inputs { background-color: #17191c !important; color: #e6e8eb !important; }
+body.lolcast-chat-dark #chattings li,
+body.lolcast-chat-dark #chattings .talk,
+body.lolcast-chat-dark #chattings .id { color: #e6e8eb; }
+body.lolcast-chat-dark a { color: #8ab4f8; }
+body.lolcast-chat-dark .form-control { background: #24282e !important; border-color: #454b54 !important; color: #f1f3f4 !important; }
+body.lolcast-chat-dark .form-control::placeholder { color: #aab0b8 !important; }
+body.lolcast-chat-dark .btn-default { background: #292d33 !important; border-color: #454b54 !important; color: #e6e8eb !important; }
+body.lolcast-chat-dark .btn-default:hover { background: #383e46 !important; }
+body.lolcast-chat-dark input,
+body.lolcast-chat-dark button,
+body.lolcast-chat-dark .form-control { text-shadow: none !important; }
+body.lolcast-chat-dark .modal-content,
+body.lolcast-chat-dark .dropdown-menu { background: #22262b !important; border-color: #454b54 !important; color: #e6e8eb !important; }
+body.lolcast-chat-dark .modal-header,
+body.lolcast-chat-dark .modal-footer,
+body.lolcast-chat-dark .nav-tabs { border-color: #454b54 !important; }
+body.lolcast-chat-dark .nav-tabs > li > a { color: #d6d9de !important; }
+body.lolcast-chat-dark .nav-tabs > li.active > a,
+body.lolcast-chat-dark .nav-tabs > li.active > a:hover { background: #292d33 !important; border-color: #454b54 !important; color: #fff !important; }

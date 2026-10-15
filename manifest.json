@@ -1,0 +1,28 @@
+{
+  "manifest_version": 3,
+  "name": "LOLCAST GIF",
+  "version": "0.1.0",
+  "description": "채팅에 Tenor GIF를 URL 없이 공유하는 확장 프로그램",
+  "minimum_chrome_version": "111",
+  "permissions": ["storage"],
+  "host_permissions": [
+    "https://lolcast.kr/*",
+    "https://insagirl-toto.appspot.com/*",
+    "https://tenor.com/*",
+    "https://media.tenor.com/*"
+  ],
+  "background": { "service_worker": "src/service-worker.js", "type": "module" },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://lolcast.kr/*",
+        "https://insagirl-toto.appspot.com/chatting/lgic/*"
+      ],
+      "all_frames": true,
+      "js": ["src/content/selectors.js", "src/content/content.js"],
+      "css": ["src/content/content.css"],
+      "run_at": "document_idle"
+    }
+  ],
+  "action": { "default_title": "LOLCAST GIF" }
+}

@@ -1,0 +1,38 @@
+name: Build Chrome extension release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Create extension package
+        shell: bash
+        run: |
+          mkdir -p dist/lolcast-gif
+          cp -r manifest.json README.md src dist/lolcast-gif/
+          cd dist
+          zip -r ../lolcast-gif-${GITHUB_REF_NAME:-dev}.zip lolcast-gif
+
+      - name: Upload workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: lolcast-gif-extension
+          path: lolcast-gif-*.zip
+
+      - name: Create GitHub release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          files: lolcast-gif-*.zip
