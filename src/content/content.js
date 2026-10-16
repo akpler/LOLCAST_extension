@@ -246,7 +246,6 @@
     let cursor = 0;
     for (const match of matches) {
       fragment.append(document.createTextNode(text.slice(cursor, match.index)));
-      // match[1]: 투명 유니코드 포맷, match[2]: 기존 {lolcast-gif:...} 포맷
       const rawId = match[1] ? fromInvisibleToken(match[1]) : match[2];
       const result = await send('LOLCAST_RESOLVE', { id: rawId });
       if (!result.ok || !result.url) {
@@ -254,7 +253,10 @@
       } else {
         const image = make('img', {
           className: 'lolcast-inline-gif', src: result.url,
-          alt: 'LOLCAST GIF', loading: 'lazy', width: '72', height: '72'
+          alt: 'LOLCAST GIF', loading: 'lazy', width: '72', height: '72',
+          title: '클릭하여 이 GIF 따라 쓰기 (최근 목록에도 저장됨)',
+          style: { cursor: 'pointer' },
+          onclick: () => insertToken(rawId)
         });
         image.addEventListener('error', () => image.replaceWith(document.createTextNode(match[0])), { once: true });
         fragment.append(image);
