@@ -1,6 +1,7 @@
 (() => {
   'use strict';
-  const TOKEN_RE = /\{lolcast-gif:([A-Za-z0-9_.%~-]{8,4096})\}/g;
+  // 1) 신규 투명 유니코드 포맷(🖼️ + U+E0020~U+E007E) 및 2) 기존 {lolcast-gif:...} 포맷 동시 지원
+  const TOKEN_RE = /🖼️([\u{E0020}-\u{E007E}]{6,4096})|\{lolcast-gif:([A-Za-z0-9_.%~-]{6,4096})\}/gu;
   const convertedTextNodes = new WeakSet();
   const recentKey = 'lolcastRecentGifs';
   const darkModeKey = 'lolcastChatDarkMode';
@@ -10,6 +11,25 @@
   const first = selectors => selectors.map(s => document.querySelector(s)).find(Boolean) || null;
   const input = () => first(LOLCAST_SELECTORS.input);
   const messageRoot = () => first(LOLCAST_SELECTORS.messages);
+
+  // 일반 ID 문자열 -> '🖼️' + 투명 태그 문자열 변환
+  function toInvisibleToken(id) {
+    let shortId = id.includes('~') ? id.split('~')[0] : id;
+    if (shortId.length === 16 && shortId.endsWith('AAAAM')) {
+      shortId = shortId.slice(0, -5);
+    }
+    const encoded = Array.from(shortId)
+      .map(ch => String.fromCodePoint(ch.codePointAt(0) + 0xE0000))
+      .join('');
+    return `🖼️${encoded}`;
+  }
+
+  // 투명 태그 문자열 -> 일반 ID 문자열 복원
+  function fromInvisibleToken(encoded) {
+    return Array.from(encoded)
+      .map(ch => String.fromCodePoint(ch.codePointAt(0) - 0xE0000))
+      .join('');
+  }
 
   function send(type, payload = {}) {
     return new Promise(resolve => chrome.runtime.sendMessage({ type, ...payload }, response => resolve(response || { ok: false })));
@@ -31,7 +51,7 @@
   function insertToken(id) {
     const field = input();
     if (!field) return;
-    const token = `{lolcast-gif:${id}}`;
+    const token = toInvisibleToken(id);
     const start = field.selectionStart ?? field.value.length;
     const end = field.selectionEnd ?? start;
     field.value = `${field.value.slice(0, start)}${token}${field.value.slice(end)}`;
@@ -130,7 +150,6 @@
     const group = field.closest('.input-group') || field.parentElement;
     if (!group || group.querySelector('.lolcast-button')) return;
 
-    // Bootstrap input-group의 기존 버튼 슬롯에 추가해 입력줄의 레이아웃 규칙을 따릅니다.
     const addon = make('span', { className: 'input-group-btn lolcast-addon' });
     const button = make('button', {
       type: 'button', className: 'btn btn-default btn-xs lolcast-button',
@@ -227,7 +246,9 @@
     let cursor = 0;
     for (const match of matches) {
       fragment.append(document.createTextNode(text.slice(cursor, match.index)));
-      const result = await send('LOLCAST_RESOLVE', { id: match[1] });
+      // match[1]: 투명 유니코드 포맷, match[2]: 기존 {lolcast-gif:...} 포맷
+      const rawId = match[1] ? fromInvisibleToken(match[1]) : match[2];
+      const result = await send('LOLCAST_RESOLVE', { id: rawId });
       if (!result.ok || !result.url) {
         fragment.append(document.createTextNode(match[0]));
       } else {
@@ -263,6 +284,7 @@
       });
     }
   }
+
   function start() {
     addButton(); addThemeButton(); scan();
     if (window === window.top) startParentThemeBridge();

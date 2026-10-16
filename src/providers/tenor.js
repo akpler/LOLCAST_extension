@@ -1,4 +1,4 @@
-const TENOR_MEDIA = /^https:\/\/media\.tenor\.com\/[A-Za-z0-9._~:/?#\[\]@!$&'()*+,;=%-]+$/;
+const TENOR_MEDIA = /^https:\/\/media\.tenor\.com\/[A-Za-z0-9._~:/?#\[\]@!$&'()*+,;=\%-]+$/;
 
 function cleanUrl(value) {
   try {
@@ -13,13 +13,19 @@ export function encodeGifId(mediaUrl) {
   const parsed = new URL(url);
   const match = parsed.pathname.match(/^\/([A-Za-z0-9_-]{6,})\/(.+\.gif)$/i);
   if (!match) return null;
-  // URL.pathname은 한글을 이미 퍼센트 인코딩하므로 그대로 토큰에 담습니다.
-  try { decodeURIComponent(match[2]); } catch { return null; }
-  return `${match[1]}~${match[2]}`;
+
+  let id = match[1];
+  // 16자리 Tenor 미디어 ID 중 'AAAAM'으로 끝나는 기본 포맷은 5글자를 생략해 길이를 최소화합니다.
+  if (id.length === 16 && id.endsWith('AAAAM')) {
+    id = id.slice(0, -5);
+  }
+  return id;
 }
 
 export function decodeGifId(id) {
   if (typeof id !== 'string' || id.length > 4096) return null;
+
+  // 1. 기존 'ID~파일명.gif' 포맷 호환 유지
   const compact = id.match(/^([A-Za-z0-9_-]{6,})~([A-Za-z0-9_.%~-]+\.gif)$/i);
   if (compact) {
     try {
@@ -29,8 +35,14 @@ export function decodeGifId(id) {
     } catch { return null; }
   }
 
-  // 이미 전송된 기존 Base64 URL 토큰의 호환성을 유지합니다.
-  if (!/^[A-Za-z0-9_-]{8,4096}$/.test(id)) return null;
+  // 2. 신규 단축 ID 포맷 (파일명 제거됨, 11자리 또는 16자리 미디어 ID)
+  if (/^[A-Za-z0-9_-]{10,24}$/.test(id)) {
+    const fullId = id.length === 11 ? `${id}AAAAM` : id;
+    return `https://media.tenor.com/${fullId}/a.gif`;
+  }
+
+  // 3. 구버전 Base64 전체 URL 토큰 호환 유지
+  if (!/^[A-Za-z0-9_-]{25,4096}$/.test(id)) return null;
   try {
     const padded = id.replaceAll('-', '+').replaceAll('_', '/') + '='.repeat((4 - id.length % 4) % 4);
     const binary = atob(padded);
@@ -52,5 +64,5 @@ export async function searchTenor(query) {
     const url = cleanUrl(match);
     if (url && /\.gif(?:\?|$)/i.test(url)) urls.add(url);
   }
-  return [...urls].slice(0, 24).map(url => ({ id: encodeGifId(url), previewUrl: url }));
+  return [...urls].slice(0, 24).map(url => ({ id: encodeGifId(url), previewUrl: url })).filter(item => item.id);
 }
